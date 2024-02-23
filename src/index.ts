@@ -103,6 +103,13 @@ client.on("interactionCreate", async (interaction) => {
 
   if (commandName === "kanal" && guild && user) {
     const channelId = options.data[0].value;
+    if (user.id != guild.ownerId) {
+      interaction.reply({
+        content: "Nur der Serverbesitzer kann den Kanal festlegen.",
+        ephemeral: true,
+      });
+      return;
+    }
 
     if (channelId) {
       const guildId = guild.id;

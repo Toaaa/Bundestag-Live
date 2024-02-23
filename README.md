@@ -21,7 +21,7 @@ Um den Bot nutzen zu können benötigst du:
 1. Klone das Repository:
 
    ```bash
-   git clone https://github.com/dein-benutzername/bundestag-live-bot.git
+   git clone https://github.com/Toaaa/bundestag-live-bot.git
    ```
 
 2. Installiere die Abhängigkeiten:
