@@ -88,6 +88,13 @@ client.on("ready", async () => {
   setInterval(checkYouTubeLiveStatus, 5 * 60 * 1000);
 });
 
+client.on("guildCreate", async (guild) => {
+  const owner = await guild.fetchOwner();
+  const guildName = guild.name;
+  await owner.send(`👋 Hey! Irgendjemand (wahrscheinlich du) hat mich gerade den Server **${guildName}** eingeladen, der dir gehört. Ich bin der **Bundestag Live** und ich benachrichtige jeden in deinem Server, sobald der deutsche Bundestag Live ist! 🥳. **Um mich einzurichten, benutze bitte '/kanal' auf deinem Server!**`);
+  console.log(`Der Bot wurde zum Server ${guild.name} (${guild.id}) hinzugefügt.`);
+});
+
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
 
