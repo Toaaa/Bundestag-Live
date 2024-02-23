@@ -67,7 +67,7 @@ const checkYouTubeLiveStatus = async () => {
         const channel = client.channels.cache.get(discordChannelId);
 
         if (channel instanceof TextChannel) {
-          console.log("Nachricht wird gesendet...")
+          console.log("Nachricht wird gesendet...");
           await channel.send({ embeds: [embed] });
         }
 
@@ -75,7 +75,10 @@ const checkYouTubeLiveStatus = async () => {
       }
     }
   } catch (err: any) {
-    console.error("Fehler bei der Überprüfung des YouTube-Live-Status: ", err.message);
+    console.error(
+      "Fehler bei der Überprüfung des YouTube-Live-Status: ",
+      err.message
+    );
   }
 };
 
