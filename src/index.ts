@@ -65,7 +65,7 @@ client.on("ready", async () => {
   botId = client.user?.id || "";
   console.log(`Logged in as ${client.user?.tag} (${botId})`);
   console.log(
-    `Invite Link: https://discord.com/api/oauth2/authorize?client_id=${client.user?.id}&permissions=134144&scope=bot`
+    `Invite Link: https://discord.com/api/oauth2/authorize?client_id=${botId}&permissions=277025508352&scope=applications.commands+bot`
   );
 
   const rest = new REST({ version: "9" }).setToken(discordBotToken);
