@@ -35,3 +35,7 @@ Um den Bot nutzen zu können benötigst du:
    npm run build
    npm run start
    ```
+
+## Konfiguration
+
+Um den Bot zu konfigurieren, lade ihn auf einen beliebigen Server ein, gehe in einen beliebigen Textkanal und schreibe `/kanal` um den Benachrichtigungskanal festzulegen.
