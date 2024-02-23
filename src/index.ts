@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, TextChannel } from "discord.js";
+﻿import { Client, GatewayIntentBits, NewsChannel, TextChannel } from "discord.js";
 import axios from "axios";
 import dotenv from "dotenv";
 
@@ -67,8 +67,9 @@ const checkYouTubeLiveStatus = async () => {
 
         const channel = client.channels.cache.get(discordChannelId);
 
-        if (channel instanceof TextChannel) {
+        if (channel instanceof TextChannel || channel instanceof NewsChannel) {
           console.log("Nachricht wird gesendet...");
+          console.log(discordChannelId, channel.name, channel.type)
           await channel.send({ embeds: [embed] });
         }
 
