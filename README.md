@@ -38,4 +38,4 @@ Um den Bot nutzen zu können benötigst du:
 
 ## Konfiguration
 
-Um den Bot zu konfigurieren, lade ihn auf einen beliebigen Server ein, gehe in einen beliebigen Textkanal und schreibe `/kanal` um den Benachrichtigungskanal festzulegen.
+Um den Bot zu konfigurieren, lade ihn auf einen deiner Server ein, gehe in einen beliebigen Textkanal und schreibe `/kanal` um den Benachrichtigungskanal festzulegen.
