@@ -40,3 +40,7 @@ Um den Bot nutzen zu können benötigst du:
 ## Konfiguration
 
 Um den Bot zu konfigurieren, lade ihn auf einen deiner Server ein, gehe in einen beliebigen Textkanal und schreibe `/kanal` um den Benachrichtigungskanal festzulegen.
+
+## Beispiel
+
+![Beispielbild einer eingebetteten Nachricht die der Bot gesendet hat. In der Nachricht ist ein Hyperlink namens 'Der Bundestag ist Live!' welcher zum YouTube-Livestream der 155. Sitzung des Deutschen Bundestages führt. Darunter ein Text der lautet "Bundestag live: 155. Sitzung des Deutschen Bundestages". In der Fußzeile der eingebetteten Nachricht steht "Bundestag Live Ankündigung • oaDMmqu35As•heute um 16:16 Uhr". Rechts in der eingebetteten Nachricht befindet sich das Thumbnail des Livestreams.](https://i.toaaa.de/i/tch40.png)
