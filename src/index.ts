@@ -73,7 +73,7 @@ client.on("ready", async () => {
     console.log("Started refreshing application (/) commands.");
 
     await rest.put(
-      Routes.applicationGuildCommands(botId, "1150751924430323812"),
+      Routes.applicationCommands(botId),
       {
         body: commands,
       }
