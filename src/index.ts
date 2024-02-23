@@ -136,12 +136,12 @@ client.on("interactionCreate", async (interaction) => {
                   });
                 } else {
                   interaction.reply({
-                    content: `Der Kanal wurde erfolgreich ${
+                    content: `Der Benachrichtigungskanal ${
                       oldChannelId
                         ? oldChannelId === channelId
                           ? `ist bereits <#${channelId}>.`
-                          : `von <#${oldChannelId}> auf <#${channelId}> aktualisiert.`
-                        : `auf <#${channelId}> gesetzt.`
+                          : `wurde von <#${oldChannelId}> auf <#${channelId}> aktualisiert.`
+                        : `wurde auf <#${channelId}> festgelegt.`
                     }`,
                     ephemeral: true,
                   });
