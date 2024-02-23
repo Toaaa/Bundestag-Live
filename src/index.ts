@@ -1,8 +1,16 @@
-﻿import { Client, GatewayIntentBits, NewsChannel, TextChannel } from "discord.js";
+﻿import {
+  Client,
+  GatewayIntentBits,
+  NewsChannel,
+  TextChannel,
+} from "discord.js";
 import axios from "axios";
 import dotenv from "dotenv";
+import sqlite3 from "sqlite3";
 
 dotenv.config();
+
+const db = new sqlite3.Database("guildConfigurations.db");
 
 const client = new Client({
   intents: [
@@ -15,66 +23,103 @@ const client = new Client({
 const youtubeApiKey = process.env.YOUTUBE_API_KEY;
 const discordBotToken = process.env.DISCORD_BOT_TOKEN;
 const youtubeChannelId = process.env.YOUTUBE_CHANNEL_ID;
-const discordChannelId = process.env.DISCORD_CHANNEL_ID;
+
+let botId: string = "";
+let _userId: string = "";
 
 const postedVideoIds = new Set<string>();
 
-if (
-  !youtubeApiKey ||
-  !discordBotToken ||
-  !youtubeChannelId ||
-  !discordChannelId
-) {
+if (!youtubeApiKey || !discordBotToken || !youtubeChannelId) {
   console.error("Bitte gib alle erforderlichen Umgebungsvariablen an.");
   process.exit(1);
 }
 
+db.serialize(() => {
+  db.run(
+    "CREATE TABLE IF NOT EXISTS guilds (id TEXT PRIMARY KEY, channel_id TEXT)"
+  );
+});
+
 console.log("Bundestag Live Bot startet...");
 
-client.on("ready", () => {
-  console.log(`Logged in as ${client.user?.tag} (${client.user?.id})`);
-  console.log(`Invite Link: https://discord.com/api/oauth2/authorize?client_id=${client.user?.id}&permissions=134144&scope=bot`);
+client.on("ready", async () => {
+  botId = client.user?.id || "";
+  console.log(`Logged in as ${client.user?.tag} (${botId})`);
+  console.log(
+    `Invite Link: https://discord.com/api/oauth2/authorize?client_id=${client.user?.id}&permissions=134144&scope=bot`
+  );
+
   checkYouTubeLiveStatus();
   setInterval(checkYouTubeLiveStatus, 5 * 60 * 1000);
 });
 
 const checkYouTubeLiveStatus = async () => {
   try {
-    const response = await axios.get(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}`
-    );
+    const guilds = Array.from(client.guilds.cache.values());
 
-    const liveVideo = response.data.items?.[0];
+    for (const guild of guilds) {
+      const guildId = guild.id;
 
-    if (liveVideo) {
-      const videoId = liveVideo.id.videoId;
+      const query =
+        "SELECT channel_id FROM guilds WHERE id = ? AND guild_id = ?";
 
-      if (!postedVideoIds.has(videoId)) {
-        console.log("Der Bundestag ist Live!");
-        const embed = {
-          title: "Der Bundestag ist Live!",
-          description: liveVideo.snippet.title,
-          url: `https://www.youtube.com/watch?v=${videoId}`,
-          color: 0xff0000,
-          timestamp: new Date().toISOString(),
-          footer: {
-            text: `Bundestag Live Ankündigung • ${videoId}`,
-          },
-          thumbnail: {
-            url: liveVideo.snippet.thumbnails.default.url,
-          },
-        };
+      db.get(
+        query,
+        [_userId, guildId],
+        async (err, row: { channel_id?: string }) => {
+          if (err) {
+            console.error(err.message);
+            return;
+          }
 
-        const channel = client.channels.cache.get(discordChannelId);
+          if (row) {
+            const channelId: string = row.channel_id!;
 
-        if (channel instanceof TextChannel || channel instanceof NewsChannel) {
-          console.log("Nachricht wird gesendet...");
-          console.log(discordChannelId, channel.name, channel.type)
-          await channel.send({ embeds: [embed] });
+            const response = await axios.get(
+              `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}`
+            );
+
+            const liveVideo = response.data.items?.[0];
+
+            if (liveVideo) {
+              const videoId = liveVideo.id.videoId;
+
+              if (!postedVideoIds.has(videoId)) {
+                console.log(
+                  `Der Bundestag ist Live auf dem Server ${guild.name} (${guildId})!`
+                );
+
+                const embed = {
+                  title: "Der Bundestag ist Live!",
+                  description: liveVideo.snippet.title,
+                  url: `https://www.youtube.com/watch?v=${videoId}`,
+                  color: 0xff0000,
+                  timestamp: new Date().toISOString(),
+                  footer: {
+                    text: `Bundestag Live Ankündigung • ${videoId}`,
+                  },
+                  thumbnail: {
+                    url: liveVideo.snippet.thumbnails.default.url,
+                  },
+                };
+
+                const channel = guild.channels.cache.get(channelId);
+
+                if (
+                  channel instanceof TextChannel ||
+                  channel instanceof NewsChannel
+                ) {
+                  console.log("Nachricht wird gesendet...");
+                  console.log(channelId, channel.name, channel.type);
+                  await channel.send({ embeds: [embed] });
+                }
+
+                postedVideoIds.add(videoId);
+              }
+            }
+          }
         }
-
-        postedVideoIds.add(videoId);
-      }
+      );
     }
   } catch (err: any) {
     console.error(
