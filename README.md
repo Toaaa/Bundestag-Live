@@ -1,9 +1,9 @@
 # Bundestag-Live
 🔔 Discord-Bot für Live-Benachrichtigungen aus dem Bundestag. 🎥🏛️
 
-## Funktionen
+---
 
-Der Bot überwacht den YouTube-Kanal auf Live-Übertragungen des Bundestags. Wenn eine Live-Übertragung erkannt wird, sendet der Bot eine Benachrichtigung in den angegebenen Discord-Channel mit Details zum Livestream.
+Dieser Bot überwacht den YouTube-Kanal auf Live-Übertragungen des Bundestags. Wenn eine Live-Übertragung erkannt wird, sendet der Bot eine Benachrichtigung in den angegebenen Discord-Channel mit Details zum Livestream.
 
 Der Live-Status wird alle 5 Minuten überprüft.
 
