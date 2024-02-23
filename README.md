@@ -8,6 +8,8 @@ Dieser Bot überwacht den YouTube-Kanal auf Live-Übertragungen des Bundestags. 
 
 Der Live-Status wird alle 5 Minuten überprüft.
 
+> Du kannst den Bot hier einladen: [Einladen](https://discord.com/api/oauth2/authorize?client_id=1210581379155370094&permissions=134144&scope=bot)
+
 ## Installation
 
 Um den Bot nutzen zu können benötigst du:
