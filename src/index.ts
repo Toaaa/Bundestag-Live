@@ -1,4 +1,4 @@
-﻿import { Client, GatewayIntentBits, TextChannel } from "discord.js";
+import { Client, GatewayIntentBits, TextChannel } from "discord.js";
 import axios from "axios";
 import dotenv from "dotenv";
 
@@ -33,7 +33,7 @@ console.log("Bundestag Live Bot startet...");
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user?.tag} (${client.user?.id})`);
-  console.log(`Invite Link: https://discord.com/api/oauth2/authorize?client_id=${client.user?.id}&permissions=8&scope=bot`);
+  console.log(`Invite Link: https://discord.com/api/oauth2/authorize?client_id=${client.user?.id}&permissions=134144&scope=bot`);
   checkYouTubeLiveStatus();
   setInterval(checkYouTubeLiveStatus, 5 * 60 * 1000);
 });
