@@ -209,7 +209,7 @@ const checkYouTubeLiveStatus = async () => {
             const newChannelId: string = row.channel_id!;
 
             const response = await axios.get(
-              `https://www.googleapis.com/youtube/v3/search?part=snippet&newChannelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}`
+              `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}`
             );
 
             const liveVideo = response.data.items?.[0];
