@@ -216,8 +216,8 @@ const checkYouTubeLiveStatus = async () => {
 
             if (liveVideo) {
               const videoId = liveVideo.id.videoId;
-              const channelId = liveVideo.snippet.channelId;
-              if (channelId !== youtubeChannelId) return;
+              const liveChannelId = liveVideo.snippet.channelId;
+              if (liveChannelId !== youtubeChannelId) return;
 
               if (!postedVideoIds.has(videoId)) {
                 console.log(
