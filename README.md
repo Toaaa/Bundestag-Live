@@ -16,7 +16,6 @@ Um den Bot nutzen zu können benötigst du:
 - Einen Discord Bot Token. Melde dich hierzu im [Discord Developer Portal](https://discord.com/developers/applications) an und erstelle einen Bot.
 - Einen [YouTube API Key](https://developers.google.com/youtube/v3/getting-started?hl=de).
 - Eine YouTube Channel ID. Für den YouTube-Kanal des [Bundestages](https://www.youtube.com/channel/UCbh5D3EdIHP4YQA5X-eK1ug) wäre dies die `UCbh5D3EdIHP4YQA5X-eK1ug`
-- Eine Discord Channel ID. In diesen Discord-Kanal wird die Benachrichtigung gesendet. Rechtsklicke auf den Discord-Kanal und wähle die Schaltfläche „Kanal-ID kopieren” aus. [Hier](https://i.toaaa.de/i/bbe8w.png) ein Bild. Falls diese Schaltfläche nicht erscheint, versuche den Entwicklermodus auf Discord zu aktivieren. Navigiere hierzu in die Discord-Einstellungen > App-Einstellungen > Erweitert > Entwickermodus.
 
 1. Klone das Repository:
 
