@@ -38,7 +38,7 @@ for (const file of commandsDir) {
   commands.push(command);
 }
 
-let guildId: string = "";
+let _guildId: string = "";
 let botId: string = "";
 let _userId: string = "";
 
@@ -102,50 +102,73 @@ client.on("interactionCreate", async (interaction) => {
   const { commandName, options, guild, user } = interaction;
 
   if (commandName === "kanal" && guild && user) {
-    const channelId = options.data[0].value;
-    if (user.id != guild.ownerId) {
-      interaction.reply({
-        content: "Nur der Serverbesitzer kann den Kanal festlegen.",
-        ephemeral: true,
-      });
-      return;
-    }
+    const newChannelId = options.data[0].value;
 
-    if (channelId) {
-      const guildId = guild.id;
-      const userId = user.id;
-      _userId = userId;
+    if (options.data[0]?.name === "status") {
       db.get(
         "SELECT channel_id FROM guilds WHERE id = ? AND guild_id = ?",
-        [userId, guildId],
+        [_userId, _guildId],
         (err, row: GuildRow) => {
           if (err) {
             console.error(err.message);
             interaction.reply({
-              content: "Fehler beim Festlegen des Kanals.",
+              content: "Fehler beim Festlegen des Benachrichtigungskanals.",
               ephemeral: true,
             });
           } else {
-            const oldChannelId = row ? row.channel_id : null;
+            const currentChannelId = row ? row.channel_id : null;
+            interaction.reply({
+              content: `Der aktuelle Benachrichtigungskanal ist <#${currentChannelId}>.`,
+              ephemeral: true,
+            });
+          }
+        }
+      );
+    }
+
+    if (newChannelId !== true) {
+      if (user.id != guild.ownerId) {
+        interaction.reply({
+          content:
+            "Nur der Serverbesitzer kann den Benachrichtigungskanal festlegen.",
+          ephemeral: true,
+        });
+        return;
+      }
+      _guildId = guild.id;
+      _userId = user.id;
+      db.get(
+        "SELECT channel_id FROM guilds WHERE id = ? AND guild_id = ?",
+        [_userId, _guildId],
+        (err, row: GuildRow) => {
+          if (err) {
+            console.error(err.message);
+            interaction.reply({
+              content: "Fehler beim Festlegen des Benachrichtigungskanals.",
+              ephemeral: true,
+            });
+          } else {
+            const currentChannelId = row ? row.channel_id : null;
 
             db.run(
               "INSERT OR REPLACE INTO guilds (id, guild_id, channel_id) VALUES (?, ?, ?)",
-              [userId, guildId, channelId],
+              [_userId, _guildId, newChannelId],
               (updateErr) => {
                 if (updateErr) {
                   console.error(updateErr.message);
                   interaction.reply({
-                    content: "Fehler beim Festlegen des Kanals.",
+                    content:
+                      "Fehler beim Festlegen des Benachrichtigungskanals.",
                     ephemeral: true,
                   });
                 } else {
                   interaction.reply({
                     content: `Der Benachrichtigungskanal ${
-                      oldChannelId
-                        ? oldChannelId === channelId
-                          ? `ist bereits <#${channelId}>.`
-                          : `wurde von <#${oldChannelId}> auf <#${channelId}> aktualisiert.`
-                        : `wurde auf <#${channelId}> festgelegt.`
+                      currentChannelId
+                        ? currentChannelId === newChannelId
+                          ? `ist bereits <#${newChannelId}>.`
+                          : `wurde von <#${currentChannelId}> auf <#${newChannelId}> aktualisiert.`
+                        : `wurde auf <#${newChannelId}> festgelegt.`
                     }`,
                     ephemeral: true,
                   });
@@ -161,8 +184,8 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("command", (command: ApplicationCommand) => {
   if (!command.guild) return;
-  guildId = command.guild.id;
-  console.log("Guild ID:", guildId);
+  _guildId = command.guild.id;
+  console.log("Guild ID:", _guildId);
 });
 
 const checkYouTubeLiveStatus = async () => {
@@ -170,14 +193,12 @@ const checkYouTubeLiveStatus = async () => {
     const guilds = Array.from(client.guilds.cache.values());
 
     for (const guild of guilds) {
-      const guildId = guild.id;
-
       const query =
         "SELECT channel_id FROM guilds WHERE id = ? AND guild_id = ?";
 
       db.get(
         query,
-        [_userId, guildId],
+        [_userId, _guildId],
         async (err, row: { channel_id?: string }) => {
           if (err) {
             console.error(err.message);
@@ -185,10 +206,10 @@ const checkYouTubeLiveStatus = async () => {
           }
 
           if (row) {
-            const channelId: string = row.channel_id!;
+            const newChannelId: string = row.channel_id!;
 
             const response = await axios.get(
-              `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}`
+              `https://www.googleapis.com/youtube/v3/search?part=snippet&newChannelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}`
             );
 
             const liveVideo = response.data.items?.[0];
@@ -198,7 +219,7 @@ const checkYouTubeLiveStatus = async () => {
 
               if (!postedVideoIds.has(videoId)) {
                 console.log(
-                  `Der Bundestag ist Live auf dem Server ${guild.name} (${guildId})!`
+                  `Der Bundestag ist Live auf dem Server ${guild.name} (${_guildId})!`
                 );
 
                 const embed = {
@@ -215,14 +236,14 @@ const checkYouTubeLiveStatus = async () => {
                   },
                 };
 
-                const channel = guild.channels.cache.get(channelId);
+                const channel = guild.channels.cache.get(newChannelId);
 
                 if (
                   channel instanceof TextChannel ||
                   channel instanceof NewsChannel
                 ) {
                   console.log("Nachricht wird gesendet...");
-                  console.log(channelId, channel.name, channel.type);
+                  console.log(newChannelId, channel.name, channel.type);
                   await channel.send({ embeds: [embed] });
                 }
 

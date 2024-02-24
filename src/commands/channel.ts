@@ -11,7 +11,15 @@ const channelCommand = new SlashCommandBuilder()
       .setDescription(
         "Setzt den Kanal, in dem die Livestream-Benachrichtigung gepostet werden soll."
       )
-      .setRequired(true)
+      .setRequired(false)
+  )
+  .addBooleanOption((option) =>
+    option
+      .setName("status")
+      .setDescription(
+        "Gibt den aktuellen Kanal zurück, in dem die Livestream-Benachrichtigung gepostet wird."
+      )
+      .setRequired(false)
   );
 
 export default channelCommand;
