@@ -83,105 +83,118 @@ client.on("ready", async () => {
   setInterval(async () => await checkYouTubeLiveStatus(), 5 * 60 * 1000);
 });
 
-client.on("guildCreate", async (guild: { fetchOwner: () => any; name: any; id: any; }) => {
-  const owner = await guild.fetchOwner();
-  const guildName = guild.name;
-  await owner.send(
-    `👋 Hey! Irgendjemand (wahrscheinlich du) hat mich gerade dem Server **${guildName}** eingeladen, der dir gehört. Ich bin **Bundestag Live** und ich benachrichtige jeden in deinem Server, sobald der deutsche Bundestag Live ist! 🔔. **Um mich einzurichten, benutze bitte \`/kanal\` auf deinem Server!**`
-  );
-  console.log(
-    `Der Bot wurde zum Server ${guild.name} (${guild.id}) hinzugefügt.`
-  );
-});
+client.on(
+  "guildCreate",
+  async (guild: { fetchOwner: () => any; name: any; id: any }) => {
+    const owner = await guild.fetchOwner();
+    const guildName = guild.name;
+    await owner.send(
+      `👋 Hey! Irgendjemand (wahrscheinlich du) hat mich gerade dem Server **${guildName}** eingeladen, der dir gehört. Ich bin **Bundestag Live** und ich benachrichtige jeden in deinem Server, sobald der deutsche Bundestag Live ist! 🔔. **Um mich einzurichten, benutze bitte \`/kanal\` auf deinem Server!**`
+    );
+    console.log(
+      `Der Bot wurde zum Server ${guild.name} (${guild.id}) hinzugefügt.`
+    );
+  }
+);
 
-client.on("interactionCreate", async (interaction: { isCommand?: any; reply?: any; commandName?: any; options?: any; guild?: any; user?: any; }) => {
-  if (!interaction.isCommand()) return;
+client.on(
+  "interactionCreate",
+  async (interaction: {
+    isCommand?: any;
+    reply?: any;
+    commandName?: any;
+    options?: any;
+    guild?: any;
+    user?: any;
+  }) => {
+    if (!interaction.isCommand()) return;
 
-  const { commandName, options, guild, user } = interaction;
+    const { commandName, options, guild, user } = interaction;
 
-  if (commandName === "kanal" && guild && user) {
-    const channelId = options.data[0].value;
-    const name = options.data[0]?.name
-    console.log("channelId", channelId)
-    console.log("name", name)
-    _guildId = guild.id;
-
-    if (name === "status") {
-      db.get(
-        "SELECT channel_id FROM guilds WHERE guild_id = ?",
-        [_guildId],
-        (err, row: GuildRow) => {
-          if (err) {
-            console.error(err.message);
-            interaction.reply({
-              content: "Fehler beim Festlegen des Benachrichtigungskanals.",
-              ephemeral: true,
-            });
-          } else {
-            const currentChannelId = row ? row.channel_id : null;
-            interaction.reply({
-              content: `Der aktuelle Benachrichtigungskanal ist <#${currentChannelId}>.`,
-              ephemeral: true,
-            });
-          }
-        }
-      );
-    }
-
-    if (channelId && name !== "status") {
+    if (commandName === "kanal" && guild && user) {
+      const channelId = options.data[0].value;
+      const name = options.data[0]?.name;
+      console.log("channelId", channelId);
+      console.log("name", name);
       _guildId = guild.id;
 
-      if (user.id != guild.ownerId) {
-        interaction.reply({
-          content: "Nur der Serverbesitzer kann den Kanal festlegen.",
-          ephemeral: true,
-        });
-        return;
+      if (name === "status") {
+        db.get(
+          "SELECT channel_id FROM guilds WHERE guild_id = ?",
+          [_guildId],
+          (err, row: GuildRow) => {
+            if (err) {
+              console.error(err.message);
+              interaction.reply({
+                content: "Fehler beim Festlegen des Benachrichtigungskanals.",
+                ephemeral: true,
+              });
+            } else {
+              const currentChannelId = row ? row.channel_id : null;
+              interaction.reply({
+                content: `Der aktuelle Benachrichtigungskanal ist <#${currentChannelId}>.`,
+                ephemeral: true,
+              });
+            }
+          }
+        );
       }
 
-      db.get(
-        "SELECT channel_id FROM guilds WHERE guild_id = ?",
-        [_guildId],
-        (err: { message: any; }, row: GuildRow) => {
-          if (err) {
-            console.error(err.message);
-            interaction.reply({
-              content: "Fehler beim Festlegen des Kanals.",
-              ephemeral: true,
-            });
-          } else {
-            const oldChannelId = row ? row.channel_id : null;
+      if (channelId && name !== "status") {
+        _guildId = guild.id;
 
-            db.run(
-              "INSERT OR REPLACE INTO guilds (guild_id, channel_id) VALUES (?, ?, ?)",
-              [_guildId, channelId],
-              (updateErr: { message: any; }) => {
-                if (updateErr) {
-                  console.error(updateErr.message);
-                  interaction.reply({
-                    content: "Fehler beim Festlegen des Kanals.",
-                    ephemeral: true,
-                  });
-                } else {
-                  interaction.reply({
-                    content: `Der Benachrichtigungskanal ${
-                      oldChannelId
-                        ? oldChannelId === channelId
-                          ? `ist bereits <#${channelId}>.`
-                          : `wurde von <#${oldChannelId}> auf <#${channelId}> aktualisiert.`
-                        : `wurde auf <#${channelId}> festgelegt.`
-                    }`,
-                    ephemeral: true,
-                  });
-                }
-              }
-            );
-          }
+        if (user.id != guild.ownerId) {
+          interaction.reply({
+            content: "Nur der Serverbesitzer kann den Kanal festlegen.",
+            ephemeral: true,
+          });
+          return;
         }
-      );
+
+        db.get(
+          "SELECT channel_id FROM guilds WHERE guild_id = ?",
+          [_guildId],
+          (err: { message: any }, row: GuildRow) => {
+            if (err) {
+              console.error(err.message);
+              interaction.reply({
+                content: "Fehler beim Festlegen des Kanals.",
+                ephemeral: true,
+              });
+            } else {
+              const oldChannelId = row ? row.channel_id : null;
+
+              db.run(
+                "INSERT OR REPLACE INTO guilds (guild_id, channel_id) VALUES (?, ?, ?)",
+                [_guildId, channelId],
+                (updateErr: { message: any }) => {
+                  if (updateErr) {
+                    console.error(updateErr.message);
+                    interaction.reply({
+                      content: "Fehler beim Festlegen des Kanals.",
+                      ephemeral: true,
+                    });
+                  } else {
+                    interaction.reply({
+                      content: `Der Benachrichtigungskanal ${
+                        oldChannelId
+                          ? oldChannelId === channelId
+                            ? `ist bereits <#${channelId}>.`
+                            : `wurde von <#${oldChannelId}> auf <#${channelId}> aktualisiert.`
+                          : `wurde auf <#${channelId}> festgelegt.`
+                      }`,
+                      ephemeral: true,
+                    });
+                  }
+                }
+              );
+            }
+          }
+        );
+      }
     }
   }
-});
+);
 
 client.on("command", (command: ApplicationCommand) => {
   if (!command.guild) return;
@@ -196,13 +209,12 @@ const checkYouTubeLiveStatus = async () => {
     for (const guild of guilds) {
       const _guildId = guild.id;
 
-      const query =
-        "SELECT channel_id FROM guilds WHERE guild_id = ?";
+      const query = "SELECT channel_id FROM guilds WHERE guild_id = ?";
 
       db.get(
         query,
         [_guildId],
-        async (err: { message: any; }, row: { channel_id?: string }) => {
+        async (err: { message: any }, row: { channel_id?: string }) => {
           if (err) {
             console.error(err.message);
             return;
