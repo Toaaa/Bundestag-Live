@@ -53,7 +53,7 @@ if (!youtubeApiKey || !discordBotToken || !youtubeChannelId) {
 
 db.serialize(() => {
   db.run(
-    "CREATE TABLE IF NOT EXISTS guilds (id TEXT, guild_id TEXT, channel_id TEXT, PRIMARY KEY (id, guild_id))"
+    "CREATE TABLE IF NOT EXISTS guilds (guild_id TEXT, channel_id TEXT, PRIMARY KEY (guild_id))"
   );
 });
 
