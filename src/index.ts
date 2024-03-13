@@ -79,8 +79,9 @@ client.on("ready", async () => {
     console.error(err);
   }
 
-  await checkYouTubeLiveStatus();
-  setInterval(async () => await checkYouTubeLiveStatus(), 5 * 60 * 1000);
+  setInterval(async () => {
+    await checkYouTubeLiveStatus();
+  }, 30 * 60 * 1000);
 });
 
 client.on(
