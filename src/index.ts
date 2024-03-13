@@ -11,6 +11,7 @@ import axios from "axios";
 import dotenv from "dotenv";
 import sqlite3 from "sqlite3";
 import fs from "fs";
+import { error } from "console";
 
 dotenv.config();
 
@@ -205,6 +206,7 @@ client.on("command", (command: ApplicationCommand) => {
 
 const checkYouTubeLiveStatus = async () => {
   try {
+    console.log("Überprüfe Live-Status...");
     const guilds = Array.from(client.guilds.cache.values());
 
     for (const guild of guilds) {
@@ -227,6 +229,13 @@ const checkYouTubeLiveStatus = async () => {
             const response = await axios.get(
               `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}`
             );
+
+            if (!response) {
+              console.error(
+                `Fehler bei der API-Abfrage! URL: 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}'`
+              );
+              return;
+            }
 
             const liveVideo = response.data.items?.[0];
 
@@ -265,6 +274,8 @@ const checkYouTubeLiveStatus = async () => {
                   await channel.send({ embeds: [embed] });
                 }
 
+                console.log(`Füge '${videoId}' zu postedVideoIds hinzu.`);
+                console.log(`postedVideoIds: ${postedVideoIds}`);
                 postedVideoIds.add(videoId);
               }
             }
