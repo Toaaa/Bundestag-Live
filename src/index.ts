@@ -206,12 +206,10 @@ client.on("command", (command: ApplicationCommand) => {
 
 const checkYouTubeLiveStatus = async () => {
   try {
-    console.log("Überprüfe Live-Status...");
     const guilds = Array.from(client.guilds.cache.values());
 
     for (const guild of guilds) {
       const _guildId = guild.id;
-
       const query = "SELECT channel_id FROM guilds WHERE guild_id = ?";
 
       db.get(
@@ -223,69 +221,86 @@ const checkYouTubeLiveStatus = async () => {
             return;
           }
 
-          if (row) {
-            const channelId: string = row.channel_id!;
+          if (!row || !row.channel_id) {
+            return;
+          }
 
+          const channelId: string = row.channel_id;
+
+          try {
+            console.log("Überprüfe Live-Status...");
             const response = await axios.get(
               `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}`
             );
 
-            if (!response) {
-              console.error(
-                `Fehler bei der API-Abfrage! URL: 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}'`
-              );
+            if (
+              !response ||
+              !response.data ||
+              !response.data.items ||
+              response.data.items.length === 0
+            ) {
+              console.error(`Fehler bei der API-Abfrage!`);
               return;
             }
 
-            const liveVideo = response.data.items?.[0];
+            const liveVideo = response.data.items[0];
 
-            if (liveVideo) {
-              const videoId = liveVideo.id.videoId;
-              const liveChannelId = liveVideo.snippet.channelId;
-              if (liveChannelId !== youtubeChannelId) return;
-
-              if (!postedVideoIds.has(videoId)) {
-                console.log(
-                  `Der Bundestag ist Live auf dem Server ${guild.name} (${_guildId})!`
-                );
-
-                const embed = {
-                  title: "Der Bundestag ist Live!",
-                  description: liveVideo.snippet.title,
-                  url: `https://www.youtube.com/watch?v=${videoId}`,
-                  color: 0xff0000,
-                  timestamp: new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' }),
-                  footer: {
-                    text: `Bundestag Live Ankündigung • ${videoId}`,
-                  },
-                  thumbnail: {
-                    url: liveVideo.snippet.thumbnails.default.url,
-                  },
-                };
-
-                const channel = guild.channels.cache.get(channelId);
-
-                if (
-                  channel instanceof TextChannel ||
-                  channel instanceof NewsChannel
-                ) {
-                  console.log("Nachricht wird gesendet...");
-                  console.log(channelId, channel.name, channel.type);
-                  await channel.send({ embeds: [embed] });
-                }
-
-                console.log(`Füge '${videoId}' zu postedVideoIds hinzu.`);
-                console.log(`postedVideoIds: ${postedVideoIds}`);
-                postedVideoIds.add(videoId);
-              }
+            if (!liveVideo) {
+              return;
             }
+
+            const videoId = liveVideo.id.videoId;
+            const liveChannelId = liveVideo.snippet.channelId;
+
+            if (liveChannelId !== youtubeChannelId) {
+              return;
+            }
+
+            if (!postedVideoIds.has(videoId)) {
+              console.log(
+                `Der Bundestag ist Live auf dem Server ${guild.name} (${_guildId})!`
+              );
+
+              const embed = {
+                title: "Der Bundestag ist Live!",
+                description: liveVideo.snippet.title,
+                url: `https://www.youtube.com/watch?v=${videoId}`,
+                color: 0xff0000,
+                timestamp: new Date().toLocaleString("de-DE", {
+                  timeZone: "Europe/Berlin",
+                }),
+                footer: {
+                  text: `Bundestag Live Ankündigung • ${videoId}`,
+                },
+                thumbnail: {
+                  url: liveVideo.snippet.thumbnails.default.url,
+                },
+              };
+
+              const channel = guild.channels.cache.get(channelId);
+
+              if (
+                channel instanceof TextChannel ||
+                channel instanceof NewsChannel
+              ) {
+                console.log("Nachricht wird gesendet...");
+                console.log(channelId, channel.name, channel.type);
+                await channel.send({ embeds: [embed] });
+              }
+
+              console.log(`Füge '${videoId}' zu postedVideoIds hinzu.`);
+              console.log(`postedVideoIds: ${Array.from(postedVideoIds)}`);
+              postedVideoIds.add(videoId);
+            }
+          } catch (err: any) {
+            console.error("Fehler bei der API-Abfrage:", err.message);
           }
         }
       );
     }
   } catch (err: any) {
     console.error(
-      "Fehler bei der Überprüfung des YouTube-Live-Status: ",
+      "Fehler bei der Überprüfung des YouTube-Live-Status:",
       err.message
     );
   }
