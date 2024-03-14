@@ -254,7 +254,7 @@ const checkYouTubeLiveStatus = async () => {
                   description: liveVideo.snippet.title,
                   url: `https://www.youtube.com/watch?v=${videoId}`,
                   color: 0xff0000,
-                  timestamp: new Date().toISOString(),
+                  timestamp: new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' }),
                   footer: {
                     text: `Bundestag Live Ankündigung • ${videoId}`,
                   },
