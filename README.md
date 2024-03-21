@@ -6,7 +6,7 @@
 
 Dieser Bot überwacht den YouTube-Kanal auf Live-Übertragungen des Bundestags. Wenn eine Live-Übertragung erkannt wird, sendet der Bot eine Benachrichtigung in den angegebenen Discord-Channel mit Details zum Livestream.
 
-Der Live-Status wird alle 5 Minuten überprüft.
+Der Live-Status wird alle 30 Minuten überprüft.
 
 > Du kannst den Bot hier einladen: [Einladen](https://discord.com/api/oauth2/authorize?client_id=1210581379155370094&permissions=277025508352&scope=applications.commands+bot)
 
