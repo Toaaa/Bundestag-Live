@@ -1,4 +1,4 @@
-﻿import {
+import {
   ApplicationCommand,
   Client,
   GatewayIntentBits,
@@ -79,6 +79,8 @@ client.on("ready", async () => {
   } catch (err: any) {
     console.error(err);
   }
+
+  await checkYouTubeLiveStatus();
 
   setInterval(async () => {
     await checkYouTubeLiveStatus();
@@ -228,7 +230,7 @@ const checkYouTubeLiveStatus = async () => {
           const channelId: string = row.channel_id;
 
           try {
-            console.log("Überprüfe Live-Status...");
+            console.log("Überprüfe Live-Status...", new Date().toLocaleTimeString('de-DE', { hour12: false }));
             const response = await axios.get(
               `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${youtubeChannelId}&eventType=live&type=video&key=${youtubeApiKey}`
             );
@@ -266,9 +268,7 @@ const checkYouTubeLiveStatus = async () => {
                 description: liveVideo.snippet.title,
                 url: `https://www.youtube.com/watch?v=${videoId}`,
                 color: 0xff0000,
-                timestamp: new Date().toLocaleString("de-DE", {
-                  timeZone: "Europe/Berlin",
-                }),
+                timestamp: new Date().toISOString(),
                 footer: {
                   text: `Bundestag Live Ankündigung • ${videoId}`,
                 },
