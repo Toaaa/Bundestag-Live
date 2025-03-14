@@ -15,7 +15,7 @@
   "repository": "git@github.com:toaaa/bundestag-live.git",
   "dependencies": {
     "@discordjs/builders": "^1.7.0",
-    "axios": "^1.6.7",
+    "axios": "^1.8.2",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
     "sqlite3": "^5.1.7"
